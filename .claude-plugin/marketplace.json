@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-devloop",
+  "description": "Iterative development loops for Claude Code",
+  "owner": {
+    "name": "alan"
+  },
+  "plugins": [
+    {
+      "name": "devloop",
+      "description": "Run Claude in a while-true loop with the same prompt until task completion",
+      "version": "1.0.0",
+      "author": {
+        "name": "alan"
+      },
+      "source": ".",
+      "category": "development"
+    }
+  ]
+}
