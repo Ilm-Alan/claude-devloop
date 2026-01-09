@@ -3,7 +3,7 @@
 # Devloop Setup Script
 # Creates state file for iterative development loop
 
-set -eo pipefail
+set -euo pipefail
 
 # Generate unique session ID for this loop instance
 SESSION_ID=$(date +%s)-$$-$RANDOM
