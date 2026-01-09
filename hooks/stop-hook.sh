@@ -137,29 +137,30 @@ fi
 TEMP_FILE="${STATE_FILE}.tmp.$$"
 sed "s/^iteration: .*/iteration: $NEXT_ITERATION/" "$STATE_FILE" > "$TEMP_FILE" && mv "$TEMP_FILE" "$STATE_FILE"
 
-# Build system message with iteration info (like ralph-loop)
+# Build iteration info for user prompt
 if [[ $MAX_ITERATIONS -ge 1 ]]; then
-  ITER_INFO="🔄 Devloop iteration $NEXT_ITERATION/$MAX_ITERATIONS"
+  ITER_INFO="Devloop iteration $NEXT_ITERATION/$MAX_ITERATIONS"
 else
-  ITER_INFO="🔄 Devloop iteration $NEXT_ITERATION"
+  ITER_INFO="Devloop iteration $NEXT_ITERATION"
 fi
 
-# Add completion promise reminder to system message
+# Add completion promise reminder
 if [[ "$COMPLETION_PROMISE" != "null" ]] && [[ -n "$COMPLETION_PROMISE" ]]; then
-  SYSTEM_MSG="$ITER_INFO | To exit: output <promise>$COMPLETION_PROMISE</promise> (ONLY when TRUE)"
+  USER_MSG="$ITER_INFO | To exit: output <promise>$COMPLETION_PROMISE</promise> (ONLY when TRUE)"
 else
-  SYSTEM_MSG="$ITER_INFO | Use /devloop:stop to exit"
+  USER_MSG="$ITER_INFO | Use /devloop:stop to exit"
 fi
 
-# Block exit and feed prompt back
-# Use systemMessage for clean iteration status (like ralph-loop)
+# Block exit and feed prompt back with iteration context
+FULL_PROMPT="$USER_MSG
+
+$PROMPT_TEXT"
+
 jq -n \
-  --arg prompt "$PROMPT_TEXT" \
-  --arg msg "$SYSTEM_MSG" \
+  --arg prompt "$FULL_PROMPT" \
   '{
     "decision": "block",
-    "reason": $prompt,
-    "systemMessage": $msg
+    "reason": $prompt
   }'
 
 exit 0
