@@ -1,6 +1,6 @@
 # Claude Devloop
 
-An iterative development loop plugin for Claude Code. Evolved from [ralph-loop](https://github.com/anthropics/claude-code-plugins/tree/main/ralph-loop) with significant improvements for reliability, multi-session support, and anti-cheat enforcement.
+An iterative development loop plugin for Claude Code. Evolved from ralph-looph with significant improvements for reliability, multi-session support, and anti-cheat enforcement.
 
 ## Why Devloop?
 
