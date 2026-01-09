@@ -194,7 +194,7 @@ No completion promise set - loop runs until iteration $MAX_ITERATIONS.
 EOF
   else
     cat <<EOF
-No completion promise set - loop runs until stopped with /devloop:stop
+No completion promise set - loop runs infinitely.
 Tip: Use -p 'promise text' for auto-completion detection.
 
 EOF
