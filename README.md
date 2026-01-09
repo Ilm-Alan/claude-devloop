@@ -4,18 +4,15 @@ An iterative development loop plugin for Claude Code. Evolved from [ralph-loop](
 
 ## Why Devloop?
 
-Ralph-loop pioneered the concept of self-referential Claude loops, but had limitations:
+Ralph-loop pioneered the concept of self-referential Claude loops, but had limitations. Devloop improves on it with:
 
-| Feature | ralph-loop | devloop |
-|---------|------------|---------|
-| Multiple concurrent sessions | No (global state file) | Yes (unique session IDs) |
-| Session isolation | None | Transcript path matching |
-| Race condition prevention | None | Claim hook on prompt submit |
-| Workflow guidance | Minimal | Comprehensive (READ/ANALYZE/CHANGE/VERIFY) |
-| Anti-cheat enforcement | Basic | Detailed anti-patterns + strong warnings |
-| Argument syntax | `--max-iterations` | `-m` / `--max-iterations` |
-| YAML escaping | Basic | Handles quotes, backslashes, multiline |
-| Escape hatch exposure | Tells Claude how to stop | No escape exposed to Claude |
+- **Multi-session support** - Unique state files per session instead of global state
+- **Session isolation** - Transcript path matching prevents cross-session interference
+- **Race condition prevention** - Claim hook on prompt submit
+- **Comprehensive workflow** - Enforces READ/ANALYZE/CHANGE/VERIFY each iteration
+- **Stronger anti-cheat** - Detailed anti-patterns and warnings, no escape hatch exposed
+- **Better argument syntax** - Short flags (`-m`, `-c`) alongside long forms
+- **Robust YAML escaping** - Handles quotes, backslashes, and multiline content
 
 ## Installation
 
@@ -142,7 +139,3 @@ started_at: "2024-01-01T12:00:00Z"
 
 Your task prompt here
 ```
-
-## License
-
-MIT
