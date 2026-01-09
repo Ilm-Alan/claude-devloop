@@ -17,7 +17,7 @@ Ralph-loop pioneered the concept of self-referential Claude loops, but had limit
 ## Installation
 
 ```bash
-/plugin install Ilm-Alan/claude-devloop
+/plugin install devloop@ilm-alan
 ```
 
 ## Usage
