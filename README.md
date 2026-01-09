@@ -1,6 +1,21 @@
 # Claude Devloop
 
-A Claude Code plugin for iterative development loops. Feeds the same prompt back to Claude repeatedly, letting it review and improve its work across multiple iterations.
+An iterative development loop plugin for Claude Code. Evolved from [ralph-loop](https://github.com/anthropics/claude-code-plugins/tree/main/ralph-loop) with significant improvements for reliability, multi-session support, and anti-cheat enforcement.
+
+## Why Devloop?
+
+Ralph-loop pioneered the concept of self-referential Claude loops, but had limitations:
+
+| Feature | ralph-loop | devloop |
+|---------|------------|---------|
+| Multiple concurrent sessions | No (global state file) | Yes (unique session IDs) |
+| Session isolation | None | Transcript path matching |
+| Race condition prevention | None | Claim hook on prompt submit |
+| Workflow guidance | Minimal | Comprehensive (READ/ANALYZE/CHANGE/VERIFY) |
+| Anti-cheat enforcement | Basic | Detailed anti-patterns + strong warnings |
+| Argument syntax | `--max-iterations` | `-m` / `--max-iterations` |
+| YAML escaping | Basic | Handles quotes, backslashes, multiline |
+| Escape hatch exposure | Tells Claude how to stop | No escape exposed to Claude |
 
 ## Installation
 
@@ -11,49 +26,88 @@ A Claude Code plugin for iterative development loops. Feeds the same prompt back
 ## Usage
 
 ```bash
+# Basic loop with iteration limit
 /devloop:start Build a REST API for todos -m 10
-/devloop:start Fix all bugs -p 'All tests passing'
+
+# Loop with completion promise (exits when genuinely true)
+/devloop:start Fix all type errors -p 'Zero TypeScript errors in build'
+
+# Both options
+/devloop:start Implement auth -m 20 -p 'Login and logout working with tests'
 ```
 
 ### Options
 
-- `-m, --max-iterations <n>` - Maximum iterations (default: unlimited, use -m N to limit)
-- `-p, --promise-complete '<text>'` - Allow early exit when statement is true
+| Flag | Long form | Description |
+|------|-----------|-------------|
+| `-m N` | `--max-iterations N` | Stop after N iterations (default: unlimited) |
+| `-p 'text'` | `--promise-complete 'text'` | Exit early when statement is true |
 
 ### Commands
 
-- `/devloop:start <prompt>` - Start a devloop
-- `/devloop:stop` - Stop the active loop
+- `/devloop:start <prompt> [options]` - Start a devloop
+- `/devloop:stop` - Stop the active loop (user-only, not exposed to Claude)
 
 ## How It Works
 
-1. You provide a task prompt
-2. Claude works on the task
-3. When Claude tries to exit, the stop hook intercepts and feeds the **same prompt** back
-4. Claude sees its previous work in files and git history
-5. Loop continues until max iterations or completion promise is fulfilled
+1. You provide a task prompt with optional iteration limit or completion promise
+2. Claude works on the task following the mandatory workflow
+3. When Claude tries to exit, the stop hook intercepts
+4. The **same prompt** feeds back with iteration context
+5. Claude sees previous work in files/git and continues improving
+6. Loop ends when: max iterations reached OR completion promise fulfilled
 
-Each iteration, Claude is instructed to:
-- READ relevant files to see current state
-- IDENTIFY at least one specific improvement
-- MAKE code changes using Edit/Write tools
-- VERIFY changes work (build/test if applicable)
+### Mandatory Workflow
+
+Each iteration, Claude must:
+
+1. **READ** - Read relevant files to see current state
+2. **ANALYZE** - Identify specific issues or improvements needed
+3. **CHANGE** - Make actual code changes via Edit/Write tools
+4. **VERIFY** - Run builds/tests to confirm changes work
+
+Short responses, summaries, or "complete" without changes are explicitly prohibited.
 
 ## Completion Promise
 
-You can set a completion promise that allows Claude to exit early when the condition is genuinely true:
+Set a completion promise for goal-oriented loops:
 
 ```bash
-/devloop:start Implement user auth -p 'Login and registration working with tests'
+/devloop:start Implement user registration -p 'Registration flow complete with validation'
 ```
 
-Claude exits by outputting: `<promise>Login and registration working with tests</promise>`
+Claude exits by outputting: `<promise>Registration flow complete with validation</promise>`
 
-**Important**: Claude must not lie to escape - the promise must be genuinely true.
+### Anti-Cheat Enforcement
 
-## Multiple Sessions
+Claude is explicitly instructed:
+- The promise must be **genuinely true** - no lying to escape
+- Even if stuck or frustrated, false promises are prohibited
+- The loop continues until the promise becomes naturally true
 
-Each loop creates a unique state file (`.claude/devloop-{session_id}.local.md`), so multiple Claude sessions can run devloops in the same directory without conflicts.
+The stop hook reminds Claude each iteration:
+```
+Devloop iteration 3 | To exit: output <promise>TEXT</promise> (ONLY when statement is TRUE - do not lie to exit!)
+```
+
+## Multi-Session Support
+
+Unlike ralph-loop's global state file, devloop creates unique state files per session:
+
+```
+.claude/devloop-1704067200-12345-9876.local.md
+.claude/devloop-1704067300-12346-5432.local.md
+```
+
+Each session is isolated via transcript path matching, so multiple Claude instances can run devloops in the same directory without conflicts.
+
+### How Session Isolation Works
+
+1. **Setup**: Creates state file with unique session ID
+2. **Claim hook**: On prompt submit, claims unclaimed state files by writing transcript path
+3. **Stop hook**: Only processes state files matching current session's transcript path
+
+This prevents the race conditions and cross-session interference that plague global state approaches.
 
 ## Files
 
@@ -62,32 +116,31 @@ claude-devloop/
 ├── .claude-plugin/
 │   └── plugin.json       # Plugin manifest
 ├── commands/
-│   ├── start.md          # /devloop:start command
-│   └── stop.md           # /devloop:stop command
+│   ├── start.md          # /devloop:start - comprehensive workflow instructions
+│   └── stop.md           # /devloop:stop - user-initiated stop
 ├── hooks/
-│   ├── hooks.json        # Stop hook config
-│   ├── stop-hook.sh      # Intercepts exit, feeds prompt back
-│   └── claim-hook.sh     # Claims state files for sessions
+│   ├── hooks.json        # Hook configuration (claim + stop)
+│   ├── claim-hook.sh     # Claims state files on UserPromptSubmit
+│   └── stop-hook.sh      # Intercepts exit, feeds prompt back
 └── scripts/
-    ├── setup-loop.sh     # Creates state file, shows banner
-    └── stop-loop.sh      # Stops the loop
+    ├── setup-loop.sh     # Argument parsing, state file creation
+    └── stop-loop.sh      # Removes state file for current session
 ```
 
-## State File
-
-The loop state is stored in `.claude/devloop-{session_id}.local.md`:
+## State File Format
 
 ```yaml
 ---
 active: true
-iteration: 1
-max_iterations: 5
-completion_promise: "Your promise text"
-transcript_path: "/path/to/transcript"
-started_at: "2024-01-01T00:00:00Z"
+iteration: 3
+max_iterations: 10
+completion_promise: "All tests passing"
+transcript_path: "/path/to/session/transcript.jsonl"
+term_session_id: "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+started_at: "2024-01-01T12:00:00Z"
 ---
 
-Your prompt here
+Your task prompt here
 ```
 
 ## License
