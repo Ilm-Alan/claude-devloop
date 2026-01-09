@@ -1,0 +1,25 @@
+{
+  "description": "Devloop plugin hooks for iterative development loops",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/claim-hook.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/stop-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
