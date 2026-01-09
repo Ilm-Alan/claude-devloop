@@ -13,7 +13,7 @@
       "author": {
         "name": "alan"
       },
-      "source": ".",
+      "source": "./devloop",
       "category": "development"
     }
   ]
