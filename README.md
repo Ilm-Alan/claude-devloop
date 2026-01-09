@@ -30,10 +30,10 @@ Ralph-loop pioneered the concept of self-referential Claude loops, but had limit
 /devloop:start Build a REST API for todos -m 10
 
 # Loop with completion promise (exits when genuinely true)
-/devloop:start Fix all type errors -p 'Zero TypeScript errors in build'
+/devloop:start Fix all type errors -c 'Zero TypeScript errors in build'
 
 # Both options
-/devloop:start Implement auth -m 20 -p 'Login and logout working with tests'
+/devloop:start Implement auth -m 20 -c 'Login and logout working with tests'
 ```
 
 ### Options
@@ -41,7 +41,7 @@ Ralph-loop pioneered the concept of self-referential Claude loops, but had limit
 | Flag | Long form | Description |
 |------|-----------|-------------|
 | `-m N` | `--max-iterations N` | Stop after N iterations (default: unlimited) |
-| `-p 'text'` | `--promise-complete 'text'` | Exit early when statement is true |
+| `-c 'text'` | `--completion-promise 'text'` | Exit early when statement is true |
 
 ### Commands
 
@@ -73,7 +73,7 @@ Short responses, summaries, or "complete" without changes are explicitly prohibi
 Set a completion promise for goal-oriented loops:
 
 ```bash
-/devloop:start Implement user registration -p 'Registration flow complete with validation'
+/devloop:start Implement user registration -c 'Registration flow complete with validation'
 ```
 
 Claude exits by outputting: `<promise>Registration flow complete with validation</promise>`

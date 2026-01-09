@@ -34,7 +34,7 @@ ARGUMENTS:
 
 OPTIONS:
   -m, --max-iterations <n>      Maximum iterations (default: unlimited, use -m N to limit)
-  -p, --promise-complete <text> Promise phrase to allow early exit (USE QUOTES)
+  -c, --completion-promise <text> Promise phrase to allow early exit (USE QUOTES)
   -h, --help                    Show this help message
 
 DESCRIPTION:
@@ -46,12 +46,12 @@ DESCRIPTION:
 
 EXAMPLES:
   /devloop:loop Refactor the auth module -m 5
-  /devloop:loop Build a REST API -p 'All endpoints implemented and tested'
-  /devloop:loop Fix all type errors --max-iterations 20 --promise-complete 'Zero type errors'
+  /devloop:loop Build a REST API -c 'All endpoints implemented and tested'
+  /devloop:loop Fix all type errors --max-iterations 20 --completion-promise 'Zero type errors'
 
 STOPPING:
   - Reaching --max-iterations limit
-  - Outputting <promise>TEXT</promise> when promise-complete is set and TRUE
+  - Outputting <promise>TEXT</promise> when completion-promise is set and TRUE
 
 MONITORING:
   # View current iteration:
@@ -88,14 +88,14 @@ HELP_EOF
       MAX_ITERATIONS="$2"
       shift 2
       ;;
-    -p|--promise-complete)
+    -c|--completion-promise)
       if [[ -z "${2:-}" ]]; then
         echo "Error: $1 requires a text argument" >&2
         echo "" >&2
         echo "   Valid examples:" >&2
-        echo "     -p 'DONE'" >&2
-        echo "     --promise-complete 'TASK COMPLETE'" >&2
-        echo "     -p 'All tests passing'" >&2
+        echo "     -c 'DONE'" >&2
+        echo "     --completion-promise 'TASK COMPLETE'" >&2
+        echo "     -c 'All tests passing'" >&2
         echo "" >&2
         echo "   You provided: $1 (with no text)" >&2
         echo "" >&2
@@ -124,7 +124,7 @@ if [[ -z "$PROMPT" ]]; then
   echo "   Examples:" >&2
   echo "     /devloop:loop Build a REST API for todos" >&2
   echo "     /devloop:loop Fix the auth bug -m 20" >&2
-  echo "     /devloop:loop -p 'DONE' Refactor code" >&2
+  echo "     /devloop:loop -c 'DONE' Refactor code" >&2
   echo "" >&2
   echo "   For all options: /devloop:loop --help" >&2
   exit 1
@@ -195,7 +195,7 @@ EOF
   else
     cat <<EOF
 No completion promise set - loop runs infinitely.
-Tip: Use -p 'promise text' for auto-completion detection.
+Tip: Use -c 'promise text' for auto-completion detection.
 
 EOF
   fi

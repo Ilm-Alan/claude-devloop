@@ -1,6 +1,6 @@
 ---
 description: "Start a devloop for iterative development"
-argument-hint: "PROMPT [-m N] [-p 'TEXT']"
+argument-hint: "PROMPT [-m N] [-c 'TEXT']"
 allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/setup-loop.sh)"]
 hide-from-slash-command-tool: "true"
 ---
@@ -23,7 +23,7 @@ After each response, the Stop hook will:
 
 ## COMPLETION PROMISE (EARLY EXIT)
 
-If `-p` / `--promise-complete` was set, you can exit early by outputting:
+If `-c` / `--completion-promise` was set, you can exit early by outputting:
 ```
 <promise>EXACT PROMISE TEXT HERE</promise>
 ```
@@ -68,10 +68,10 @@ Start a loop that runs for 5 iterations max:
 
 Start a loop with early exit condition:
 ```
-/devloop:start Fix all type errors -p 'Zero TypeScript errors in build'
+/devloop:start Fix all type errors -c 'Zero TypeScript errors in build'
 ```
 
 Full example with both options:
 ```
-/devloop:start Build user registration --max-iterations 10 --promise-complete 'Registration flow complete with tests'
+/devloop:start Build user registration --max-iterations 10 --completion-promise 'Registration flow complete with tests'
 ```
