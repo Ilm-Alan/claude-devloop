@@ -137,18 +137,11 @@ fi
 TEMP_FILE="${STATE_FILE}.tmp.$$"
 sed "s/^iteration: .*/iteration: $NEXT_ITERATION/" "$STATE_FILE" > "$TEMP_FILE" && mv "$TEMP_FILE" "$STATE_FILE"
 
-# Build iteration info for user prompt
-if [[ $MAX_ITERATIONS -ge 1 ]]; then
-  ITER_INFO="Devloop iteration $NEXT_ITERATION/$MAX_ITERATIONS"
-else
-  ITER_INFO="Devloop iteration $NEXT_ITERATION"
-fi
-
-# Add completion promise reminder
+# Build system message
 if [[ "$COMPLETION_PROMISE" != "null" ]] && [[ -n "$COMPLETION_PROMISE" ]]; then
-  USER_MSG="$ITER_INFO | To exit: output <promise>$COMPLETION_PROMISE</promise> (ONLY when TRUE)"
+  USER_MSG="Devloop iteration $NEXT_ITERATION | To exit: output <promise>$COMPLETION_PROMISE</promise> (ONLY when statement is TRUE - do not lie to exit!)"
 else
-  USER_MSG="$ITER_INFO | Use /devloop:stop to exit"
+  USER_MSG="Devloop iteration $NEXT_ITERATION | No completion promise set - loop runs infinitely"
 fi
 
 # Block exit and feed prompt back with iteration context
