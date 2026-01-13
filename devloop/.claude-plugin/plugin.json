@@ -1,9 +1,0 @@
-{
-  "name": "claude-devloop",
-  "version": "1.0.0",
-  "description": "Iterative development loops for Claude Code - run Claude in a while-true loop with the same prompt until task completion, allowing self-referential improvement through file and git history.",
-  "author": {
-    "name": "alan"
-  },
-  "repository": "https://github.com/Ilm-Alan/claude-devloop"
-}
