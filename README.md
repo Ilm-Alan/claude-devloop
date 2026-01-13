@@ -1,10 +1,10 @@
-# Claude Devloop
+# Claude Loop
 
 An iterative development loop plugin for Claude Code. Evolved from ralph-loop with significant improvements for reliability, multi-session support, and anti-cheat enforcement.
 
-## Why Devloop?
+## Why Loop?
 
-Ralph-loop pioneered the concept of self-referential Claude loops, but had limitations. Devloop improves on it with:
+Ralph-loop pioneered the concept of self-referential Claude loops, but had limitations. Loop improves on it with:
 
 - **Multi-session support** - Unique state files per session instead of global state
 - **Session isolation** - Transcript path matching prevents cross-session interference
@@ -17,21 +17,21 @@ Ralph-loop pioneered the concept of self-referential Claude loops, but had limit
 ## Installation
 
 ```bash
-/plugin marketplace add Ilm-Alan/claude-devloop
-/plugin install devloop@claude-devloop
+/plugin marketplace add Ilm-Alan/claude-loop
+/plugin install loop@claude-loop
 ```
 
 ## Usage
 
 ```bash
 # Basic loop with iteration limit
-/devloop:start Build a REST API for todos -m 10
+/loop:start Build a REST API for todos -m 10
 
 # Loop with completion promise (exits when genuinely true)
-/devloop:start Fix all type errors -c 'Zero TypeScript errors in build'
+/loop:start Fix all type errors -c 'Zero TypeScript errors in build'
 
 # Both options
-/devloop:start Implement auth -m 20 -c 'Login and logout working with tests'
+/loop:start Implement auth -m 20 -c 'Login and logout working with tests'
 ```
 
 ### Options
@@ -43,8 +43,8 @@ Ralph-loop pioneered the concept of self-referential Claude loops, but had limit
 
 ### Commands
 
-- `/devloop:start <prompt> [options]` - Start a devloop
-- `/devloop:stop` - Stop the active loop (user-only, not exposed to Claude)
+- `/loop:start <prompt> [options]` - Start a loop
+- `/loop:stop` - Stop the active loop (user-only, not exposed to Claude)
 
 ## How It Works
 
@@ -71,7 +71,7 @@ Short responses, summaries, or "complete" without changes are explicitly prohibi
 Set a completion promise for goal-oriented loops:
 
 ```bash
-/devloop:start Implement user registration -c 'Registration flow complete with validation'
+/loop:start Implement user registration -c 'Registration flow complete with validation'
 ```
 
 Claude exits by outputting: `<promise>Registration flow complete with validation</promise>`
@@ -85,19 +85,19 @@ Claude is explicitly instructed:
 
 The stop hook reminds Claude each iteration:
 ```
-Devloop iteration 3 | To exit: output <promise>TEXT</promise> (ONLY when statement is TRUE - do not lie to exit!)
+Loop iteration 3 | To exit: output <promise>TEXT</promise> (ONLY when statement is TRUE - do not lie to exit!)
 ```
 
 ## Multi-Session Support
 
-Unlike ralph-loop's global state file, devloop creates unique state files per session:
+Unlike ralph-loop's global state file, loop creates unique state files per session:
 
 ```
-.claude/devloop-1704067200-12345-9876.local.md
-.claude/devloop-1704067300-12346-5432.local.md
+.claude/loop-1704067200-12345-9876.local.md
+.claude/loop-1704067300-12346-5432.local.md
 ```
 
-Each session is isolated via transcript path matching, so multiple Claude instances can run devloops in the same directory without conflicts.
+Each session is isolated via transcript path matching, so multiple Claude instances can run loops in the same directory without conflicts.
 
 ### How Session Isolation Works
 
@@ -110,16 +110,16 @@ This prevents the race conditions and cross-session interference that plague glo
 ## Repository Structure
 
 ```
-claude-devloop/
+claude-loop/
 ├── .claude-plugin/
 │   └── marketplace.json  # Marketplace manifest
 ├── README.md             # This file
-└── devloop/              # The plugin
+└── loop/                 # The plugin
     ├── .claude-plugin/
     │   └── plugin.json   # Plugin manifest
     ├── commands/
-    │   ├── start.md      # /devloop:start - comprehensive workflow instructions
-    │   └── stop.md       # /devloop:stop - user-initiated stop
+    │   ├── start.md      # /loop:start - comprehensive workflow instructions
+    │   └── stop.md       # /loop:stop - user-initiated stop
     ├── hooks/
     │   ├── hooks.json    # Hook configuration (claim + stop)
     │   ├── claim-hook.sh # Claims state files on UserPromptSubmit
